@@ -350,8 +350,10 @@ namespace org.fressian.impl
 
         internal static long getTime(DateTime d)
         {
-            var tms = d.ToUniversalTime().Subtract(EPOCH).TotalMilliseconds;
-            return (long)tms;
+            var ts = d.ToUniversalTime().Subtract(EPOCH).TotalSeconds;
+            var ms = d.ToUniversalTime().Subtract(EPOCH).Milliseconds;
+            long tms = (long)ts * 1000 + ms;
+            return tms;
         }
 
         internal static DateTime toDateTime(long t)
