@@ -1,0 +1,30 @@
+---
+name: nupkg
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    - uses: olegtarasov/get-tag@v2.1.4
+      id: tagVersion
+      with:
+        tagRegex: "v(.*)"
+    - name: Restore, build and create NuGet package
+      run: dotnet pack src/clr/fressian.csproj -p:PublishVersion="${{ steps.tagVersion.outputs.tag }}"
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: src/clr/bin/Release/fressian.${{ steps.tagVersion.outputs.tag }}.nupkg
+        tag: ${{ github.ref }}
+        overwrite: true
+        body: ""
